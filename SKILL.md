@@ -133,7 +133,7 @@ Use textBoxes to label VPC/subnets/AZ.
 Each connector MUST include:
 
 - id: string (REQUIRED)
-- anchors: array of anchors (REQUIRED)
+- anchors: array of anchors (REQUIRED, minimum 2)
   Optional:
 - style?: SOLID|DOTTED|DASHED
 - lineType?: SINGLE|DOUBLE|DOUBLE_WITH_CIRCLE
@@ -145,15 +145,42 @@ Each connector MUST include:
 
 Anchor schema:
 
-- id: string (REQUIRED)
-- ref: object with optional fields:
-  - item?: string (must reference a view item id)
-  - anchor?: string
-  - tile?: {x,y}
+- id: string (REQUIRED) — must be unique per connector; use pattern `{connectorId}-a1`, `{connectorId}-a2`, etc.
+- ref: object (REQUIRED) — **MUST contain EXACTLY ONE key**. Choose only one:
+  - item: string — references a view item id (use for source/destination endpoints)
+  - anchor: string — references another anchor id (for cross-anchor connections)
+  - tile: {x,y} — isometric tile coordinates (use for intermediate waypoints)
 
-Use at least 2 anchors:
+**CRITICAL ANCHOR RULE — NEVER VIOLATE:**
+- `ref` must have **exactly 1 key**. Zero keys or 2+ keys will fail validation.
+- NEVER combine `item` + `tile`, `item` + `anchor`, or `tile` + `anchor` in the same `ref`.
+- NEVER add a `tile` field alongside `item` to "hint" at routing position.
+- Do NOT add extra optional fields to `ref` to aid with positioning.
 
-- [{ref:{item:"SRC"}},{ref:{item:"DST"}}]
+Correct minimal connector (2 anchors):
+```json
+{
+  "id": "con_src_to_dst",
+  "anchors": [
+    { "id": "con_src_to_dst-a1", "ref": { "item": "src_view_item_id" } },
+    { "id": "con_src_to_dst-a2", "ref": { "item": "dst_view_item_id" } }
+  ]
+}
+```
+
+Correct connector with intermediate waypoint (3 anchors):
+```json
+{
+  "id": "con_src_to_dst",
+  "anchors": [
+    { "id": "con_src_to_dst-a1", "ref": { "item": "src_view_item_id" } },
+    { "id": "con_src_to_dst-a2", "ref": { "tile": { "x": 5, "y": 4 } } },
+    { "id": "con_src_to_dst-a3", "ref": { "item": "dst_view_item_id" } }
+  ]
+}
+```
+
+**`ref.item` must reference a `views[*].items[*].id`** (the view item id, i.e. the id of the item as it appears in `views[*].items`, which matches the model `items[*].id`).
 
 ---
 

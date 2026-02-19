@@ -7,12 +7,12 @@ An [Agent Skill](https://agentskills.io) for generating **FossFLOW-importable AW
 Tell Claude to draw your AWS infrastructure and get back a valid JSON object you can import directly into [FossFLOW](https://github.com/stan-smith/FossFLOW). The skill enforces the full FossFLOW `modelSchema` — every `id`, icon `name`/`url`, color `value`, connector, rectangle `from`/`to`, and `textBox` is guaranteed correct.
 
 **Default output** (when you don't specify):
+
 - 1 VPC · 2 Availability Zones · Public + Private subnets
 - Route 53 → CloudFront → ALB → App servers → RDS
 - Real AWS architecture SVG icon URLs (no placeholders)
 
-<!-- Screenshots -->
-<!-- Add your screenshots here -->
+![Default output](./assets/example.png)
 
 ## Installation
 
